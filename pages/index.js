@@ -6,7 +6,8 @@ import Image from "next/image";
 import Banner from "../components/Banner";
 import Card from "../components/Card";
 
-import styles from "../styles/Home.module.css";
+import styles from "../styles/Home.module.css"
+
 
 import { fetchCoffeeStores } from "../lib/coffee-stores";
 import useTrackLocation from "../hooks/use-track-location";
