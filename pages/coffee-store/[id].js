@@ -47,6 +47,7 @@ export async function getStaticPaths() {
 
 const CoffeeStore = (initialProps) => {
   const [coffeeStore, setCoffeeStor] = useState(initialProps.coffeeStore);
+  const [votingCount, setVotingCount] = useState(0)
   const {
     state: { coffeeStores },
   } = useContext(StoreContext);
@@ -109,7 +110,8 @@ const CoffeeStore = (initialProps) => {
   const { name, address, imgUrl } = coffeeStore;
 
   const handleUpvoteButton = () => {
-    console.log("Upvote");
+    let count = votingCount + 1
+setVotingCount(count)
   };
 
   return (
@@ -160,7 +162,7 @@ const CoffeeStore = (initialProps) => {
               height="24"
               alt="etoile"
             />
-            <p className={styles.text}>0</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
           <button className={styles.upvoteButton} onClick={handleUpvoteButton}>
             Up vote!
