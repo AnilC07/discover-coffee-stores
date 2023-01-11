@@ -16,7 +16,7 @@ import { isEmpty } from "../../utils";
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params; // c'est pas des "props mais des "staticprops
-  console.log(params);
+
   // Recupere toute les donnees pour eensuite trouver celui qui coorrespond a l'id
   const coffeeStore = await fetchCoffeeStores();
   const findCoffeeStoreById = coffeeStore.find((coffeeStore) => {
@@ -73,7 +73,7 @@ const CoffeeStore = (initialProps) => {
         }),
       });
       const dbCoffeeStore = await response.json();
-      console.log({ dbCoffeeStore });
+
     } catch (error) {
       console.log(error);
     }
@@ -106,15 +106,11 @@ const CoffeeStore = (initialProps) => {
   //   address: result.location.formatted_address,
   //   imgUrl: photos.length > 0 ? photos[index] : null
   // };
-  console.log(coffeeStore.name);
   const { name, address, imgUrl } = coffeeStore;
-  console.log({ name, address, imgUrl });
 
   const handleUpvoteButton = () => {
     console.log("Upvote");
   };
-
-  // console.log(categories[0].icon.prefix)
 
   return (
     <div className={styles.layout}>

@@ -8,7 +8,6 @@ import Card from "../components/Card";
 
 import styles from "../styles/Home.module.css"
 
-
 import { fetchCoffeeStores } from "../lib/coffee-stores";
 import useTrackLocation from "../hooks/use-track-location";
 
@@ -34,8 +33,6 @@ export default function Home(props) {
   // const [coffeeStores,setCoffeeStores] = useState("")
   const [coffeeStoresError, setCoffeeStoresError] = useState("");
 
-  // console.log({ latLong, locationErrorMsg });
-
   const { dispatch, state } = useContext(StoreContext);
 
   const { coffeeStores, latLong } = state;
@@ -45,9 +42,8 @@ export default function Home(props) {
       if (latLong) {
         try {
           const response = await fetch(`/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=10`)
-          // console.log(response)
+
           const coffeeStores = await response.json()
-          // console.log(coffeeStores)
 
           // setCoffeeStores(fetchCoffeStores)
           dispatch({
@@ -58,7 +54,6 @@ export default function Home(props) {
           });
           setCoffeeStoresError("");
         } catch (error) {
-          console.log(error);
           setCoffeeStoresError(error);
         }
       }
@@ -99,8 +94,6 @@ export default function Home(props) {
           />
         </div>
         {/* Verifie le contenue du fetch */}
-         {console.log(coffeeStores)} 
-        {/* {console.log(coffeeStores.response.length)} */}
         {coffeeStores.length > 0 && (
           <div className={styles.sectionWrapper}>
             <h2 className={styles.heading2}>Stores near me</h2>
