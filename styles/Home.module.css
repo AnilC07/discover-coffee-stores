@@ -35,11 +35,15 @@ justify-content: center;
 
 /** Breakpoints:
   sm: min-width: 640px;
-  md: min-width: 768px;
+  md: min-width: 968px;
   lg: min-width: 1024px;
   xl: min-width: 1280px;
   2xl: min-width: 1536px;
 **/
+
+.sectionWrapper{
+  margin-top: 5rem;
+}
 
 @media (min-width: 640px) {
   .container {
@@ -58,7 +62,7 @@ justify-content: center;
     }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 968px) {
   .container {
     padding-left: 2.5rem /* 40px */;
     padding-right: 2.5rem /* 40px */;

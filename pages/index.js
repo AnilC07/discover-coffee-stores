@@ -1,29 +1,74 @@
+import { useContext, useEffect, useState } from "react";
+
 import Head from "next/head";
 import Image from "next/image";
-import { Inter } from "@next/font/google";
-import styles from "../styles/Home.module.css";
+
 import Banner from "../components/Banner";
 import Card from "../components/Card";
-import coffeeStoresData from "./data/coffee-stores.json";
+
+import styles from "../styles/Home.module.css";
+
 import { fetchCoffeeStores } from "../lib/coffee-stores";
+import useTrackLocation from "../hooks/use-track-location";
 
-const inter = Inter({ subsets: ["latin"] });
+import { ACTION_TYPES, StoreContext } from "../store/store-context";
 
-// Staticprops
+// getStaticProps
 export async function getStaticProps(context) {
-  
-  const coffeeStores = await fetchCoffeeStores()
-  
+  // fais appel a la fonction pour recuperer tous les lieux
+  const coffeeStores = await fetchCoffeeStores();
+
+  // Retourne le resultat en props
   return {
     props: {
-      coffeeStores
+      coffeeStores,
     },
   };
 }
 
 export default function Home(props) {
-  // console.log("props", props);
-  const handleOnBannerbuttonClick = () => {};
+  const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
+    useTrackLocation();
+
+  // const [coffeeStores,setCoffeeStores] = useState("")
+  const [coffeeStoresError, setCoffeeStoresError] = useState("");
+
+  // console.log({ latLong, locationErrorMsg });
+
+  const { dispatch, state } = useContext(StoreContext);
+
+  const { coffeeStores, latLong } = state;
+
+  useEffect(() => {
+    async function setCoffeeStoresByLocation() {
+      if (latLong) {
+        try {
+          const response = await fetch(`/api/getCoffeeStoresByLocation?latLong=${latLong}&limit=10`)
+          // console.log(response)
+          const coffeeStores = await response.json()
+          // console.log(coffeeStores)
+
+          // setCoffeeStores(fetchCoffeStores)
+          dispatch({
+            type: ACTION_TYPES.SET_COFFEE_STORE,
+            payload: {
+              coffeeStores : coffeeStores.response
+            },
+          });
+          setCoffeeStoresError("");
+        } catch (error) {
+          console.log(error);
+          setCoffeeStoresError(error);
+        }
+      }
+    }
+    setCoffeeStoresByLocation();
+  }, [latLong]);
+
+  const handleOnBannerbuttonClick = () => {
+    console.log("hi banner button clicked");
+    handleTrackLocation();
+  };
 
   return (
     <>
@@ -37,9 +82,14 @@ export default function Home(props) {
       <main className={styles.main}>
         <Banner
           handleOnClick={handleOnBannerbuttonClick}
-          buttonText="Viex stores nearby"
+          buttonText={isFindingLocation ? "Locating" : "View stores nearby"}
         />
+        {locationErrorMsg && <p>Something went wrong: {locationErrorMsg}</p>}
+        {coffeeStoresError && (
+          <p>Something went wrong: {coffeeStoresError.message}</p>
+        )}
         <div className={styles.heroImage}>
+          {/* src width height alt requis par le composant */}
           <Image
             src="/static/hero-image.png"
             width={700}
@@ -47,26 +97,54 @@ export default function Home(props) {
             alt="hero-image"
           />
         </div>
-        {props.coffeeStores.length > 0 && (
-          <>
-            <h2 className={styles.heading2}>Toronto stores</h2>
+        {/* Verifie le contenue du fetch */}
+         {console.log(coffeeStores)} 
+        {/* {console.log(coffeeStores.response.length)} */}
+        {coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Stores near me</h2>
             <div className={styles.cardLayout}>
-              {props.coffeeStores.map((el) => {
+              {/* map sur le contenu pour l'afficher dans des cards */}
+              {coffeeStores.map((el) => {
                 return (
                   <Card
-                    key={el.fsq_id}
+                    key={el.id}
                     className={styles.card}
                     imgUrl={
                       el.imgUrl ||
                       "https://images.unsplash.com/photo-1498804103079-a6351b050096?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2468&q=80"
                     }
                     name={el.name}
-                    href={`/coffee-store/${el.fsq_id}`}
+                    href={`/coffee-store/${el.id}`}
                   />
                 );
               })}
             </div>
-          </>
+          </div>
+        )}
+        
+
+        {props.coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Toronto stores</h2>
+            <div className={styles.cardLayout}>
+              {/* map sur le contenu pour l'afficher dans des cards */}
+              {props.coffeeStores.map((el) => {
+                return (
+                  <Card
+                    key={el.id}
+                    className={styles.card}
+                    imgUrl={
+                      el.imgUrl ||
+                      "https://images.unsplash.com/photo-1498804103079-a6351b050096?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2468&q=80"
+                    }
+                    name={el.name}
+                    href={`/coffee-store/${el.id}`}
+                  />
+                );
+              })}
+            </div>
+          </div>
         )}
       </main>
     </>
