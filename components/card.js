@@ -22,6 +22,7 @@ const Card = (props) => {
           height={160}
         />
       </div>
+      
     </Link>
   );
 };
