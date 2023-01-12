@@ -5,14 +5,14 @@ import {
 } from "../../lib/airtable";
 
 const createCoffeeStore = async (req, res) => {
-  console.log(req.method);
+
   if (req.method === "POST") {
     const { id, name, address, neighborhood, voting, imgUrl } = req.body;
     try {
       if (id) {
         // Find a record
         const records = await findRecordByFilter(id);
-        console.log(records);
+
         if (records.length > 0) {
           res.status(200).json(records);
         } else {

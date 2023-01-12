@@ -89,7 +89,6 @@ const CoffeeStore = (initialProps) => {
   },[data])
 
   const handleUpvoteButton = async () => {
-    console.log('upvote')
     try {
       const response = await fetch("/api/favouriteCoffeeStoreById", {
         method: "PUT",
@@ -106,7 +105,7 @@ const CoffeeStore = (initialProps) => {
       let count = votingCount + 1;
       setVotingCount(count);}
     } catch (error) {
-      console.log(error);
+
     }
   };
 
@@ -133,7 +132,7 @@ const CoffeeStore = (initialProps) => {
       });
       const dbCoffeeStore = await response.json();
     } catch (error) {
-      console.log(error);
+
     }
   };
 
