@@ -7,4 +7,5 @@ module.exports = {
   images:{
     domains:["images.unsplash.com", "ss3.4sqi.net"],
   },
+  target:"serverless",
 }
