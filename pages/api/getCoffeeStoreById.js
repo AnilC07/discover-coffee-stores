@@ -6,11 +6,11 @@ import {
 
 const getCoffeeStoreById = async (req, res) => {
   const { id } = req.query;
-  console.log(id)
+
   try {
     if (id) {
       const records = await findRecordByFilter(id);
-      console.log(records)
+
       if (records.length > 0) {
         res.status(200).json(records);
       } else {

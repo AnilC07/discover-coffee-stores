@@ -5,6 +5,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
 
+import useSWR from "swr";
+
 import cls from "classnames";
 
 import { fetchCoffeeStores } from "../../lib/coffee-stores";
@@ -13,6 +15,8 @@ import styles from "../../styles/coffee-stores.module.css";
 import { StoreContext } from "../../store/store-context";
 
 import { isEmpty } from "../../utils";
+import {fetcher} from '../../utils/fetcher'
+import favouriteCoffeeStoreById from "../api/favouriteCoffeeStoreById";
 
 export async function getStaticProps(staticProps) {
   const params = staticProps.params; // c'est pas des "props mais des "staticprops
@@ -47,7 +51,7 @@ export async function getStaticPaths() {
 
 const CoffeeStore = (initialProps) => {
   const [coffeeStore, setCoffeeStor] = useState(initialProps.coffeeStore);
-  const [votingCount, setVotingCount] = useState(0)
+  const [votingCount, setVotingCount] = useState(0);
   const {
     state: { coffeeStores },
   } = useContext(StoreContext);
@@ -55,6 +59,60 @@ const CoffeeStore = (initialProps) => {
   const router = useRouter();
 
   const id = router.query.id;
+
+  useEffect(() => {
+    if (isEmpty(initialProps.coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
+          return coffeeStore.id.toString() === id;
+        });
+        if (findCoffeeStoreById) {
+          setCoffeeStor(findCoffeeStoreById);
+          handleCreateCoffeeStore(findCoffeeStoreById);
+        }
+      }
+    } else {
+      handleCreateCoffeeStore(initialProps.coffeeStore);
+    }
+  }, [id, initialProps.CoffeeStore]);
+
+  const { data, error } = useSWR(`/api/getCoffeeStoreById?id=${id}`, fetcher);
+
+
+  useEffect(() => {
+
+    if(data && data.length > 0) {
+
+      setCoffeeStor(data[0])
+      setVotingCount(data[0].voting)
+    }
+  },[data])
+
+  const handleUpvoteButton = async () => {
+    console.log('upvote')
+    try {
+      const response = await fetch("/api/favouriteCoffeeStoreById", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id
+        }),
+      });
+      const dbCoffeeStore = await response.json();
+
+      if(dbCoffeeStore && dbCoffeeStore.length >0){
+      let count = votingCount + 1;
+      setVotingCount(count);}
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  if(error){
+    return <div>Something went wrong : {error.message}</div>
+  }
 
   const handleCreateCoffeeStore = async (coffeeStore) => {
     try {
@@ -67,33 +125,20 @@ const CoffeeStore = (initialProps) => {
         body: JSON.stringify({
           id,
           name,
-          address:address || "",
+          address: address || "",
           neighborhood: neighborhood || "",
           voting: 0,
-          imgUrl 
+          imgUrl,
         }),
       });
       const dbCoffeeStore = await response.json();
-
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    if (isEmpty(initialProps.coffeeStore)) {
-      if (coffeeStores.length > 0) {
-        const findCoffeeStoreById = coffeeStores.find((coffeeStore) => {
-          return coffeeStore.id.toString() === id;
-        });
-        if (findCoffeeStoreById) {
-          setCoffeeStor(findCoffeeStoreById);
-          handleCreateCoffeeStore(findCoffeeStoreById);
-        }
-      }
-    }else{
-      handleCreateCoffeeStore(initialProps.coffeeStore)
-    }
-  }, [id,initialProps.CoffeeStore]);
+
+
+  
 
   // Dans le cas où la page est visité pour la premiere fois. affiche le message suivant indiquant a lutilisateur qu'il charge la donnée
   if (router.isFallback) {
@@ -108,11 +153,6 @@ const CoffeeStore = (initialProps) => {
   //   imgUrl: photos.length > 0 ? photos[index] : null
   // };
   const { name, address, imgUrl } = coffeeStore;
-
-  const handleUpvoteButton = () => {
-    let count = votingCount + 1
-setVotingCount(count)
-  };
 
   return (
     <div className={styles.layout}>

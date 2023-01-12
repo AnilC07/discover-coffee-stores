@@ -62,7 +62,7 @@ export default function Home(props) {
   }, [latLong]);
 
   const handleOnBannerbuttonClick = () => {
-    console.log("hi banner button clicked");
+
     handleTrackLocation();
   };
 
