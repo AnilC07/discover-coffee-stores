@@ -5,7 +5,6 @@ import {
 } from "../../lib/airtable";
 
 const favouriteCoffeeStoreById = async (req, res) => {
-
   if (req.method === "PUT") {
     try {
       const { id } = req.body;
