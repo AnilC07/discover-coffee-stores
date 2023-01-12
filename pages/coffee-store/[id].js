@@ -192,7 +192,7 @@ const CoffeeStore = (initialProps) => {
           )}
           {/* <div className={styles.iconWrapper}>
             <Image src="/static/icons/nearMe.svg" width="24" height="24" />
-            {/* <p className={styles.text}>{location.neighborhood[0]}</p> 
+            {/* <p className={styles.text}>{neighborhood}</p> 
           </div> */}
           <div className={styles.iconWrapper}>
             <Image
